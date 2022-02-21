@@ -1,0 +1,11 @@
+name: Publish Document
+title:
+username:
+account: rpubs
+server: rpubs.com
+hostUrl: rpubs.com
+appId: https://api.rpubs.com/api/v1/document/867925/6700823462fa445bb770b297404e7001
+bundleId: https://api.rpubs.com/api/v1/document/867925/6700823462fa445bb770b297404e7001
+url: http://rpubs.com/bianca85/867925
+when: 1645243061.64684
+lastSyncTime: 1645243061.64686

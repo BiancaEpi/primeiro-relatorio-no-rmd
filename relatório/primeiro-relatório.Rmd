@@ -1,0 +1,204 @@
+---
+title: "Relatório do curso"
+author: "Bianca Bittencourt"
+date: "2/2/2022"
+output: html_document
+params:
+  ano: 2007
+
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Primeiros passos no Rmarkdown
+
+### Títulos e subtítulos 
+
+O número de # definem os títulos e subtítulos. Dois ## definem os subtitulos, três ### definem novos subtitulos e assim por diante. 
+
+### Listas numeradas
+
+É possivel fazer listas numerdas incluindo um número e ponto. Ex. 1. 1. 1. Precisa dar um enter no parágrafo e um tab. 
+
+  1. primeiro intem
+  1. segundo intem
+  1. terceiro intem 
+
+### Listas não numeradas
+
+Também da pra fazer listas nao numeradas com um travessão: 
+
+  - Item 1
+  - Item 2
+  - Item 3
+
+### Negrito
+
+Para usar o **negrito** utiliza dois asteriscos. 
+
+### Itálico
+
+Para usar o *itálico* utiliza um asterisco. 
+
+### Destacar comandos 
+
+Utiliza-se o crases  para indicar um comando a ser visualizado em destaque no texto. Como `table(pinguins$ilha)`
+
+### Citação 
+
+Para incluir citação inseri um > 
+
+> Segundo o conteúdo do curso de verão USP
+
+### Links
+
+Para incluir links dois colchetes *mostra o texto* e dois parenteses *inseri o link*.
+
+[Acesso ao Rmarkdown](https://rmarkdown.rstudio.com/)
+
+### Figuras
+
+Para inserir figuras primeiro o simbolo de exclamação, seguido de parenteses e colchetes.
+
+[![imagem do Rmarkdow](https://camo.githubusercontent.com/de0519dd8e4ebc982eb0ddfaa9c6cd0924149e6c/68747470733a2f2f626f6f6b646f776e2e6f72672f79696875692f726d61726b646f776e2f696d616765732f6865782d726d61726b646f776e2e706e67) 
+
+### Aula 1 
+
+[Link da primeira aula do curso](https://cursosextensao.usp.br/course/view.php?id=2991&section=4)
+
+
+# Códigos nos chucks 
+
+Tem alguns comandos no chuck que evitam que mensagens indesejadas apareçam. Ou pode definir se ocódigo deve ser executado ou se quer que o comando fique visivel no documento. 
+
+```{r pacotes, eval=FALSE}
+library(here)
+```
+
+## Importando a base de dados 
+
+Existe diferenca entre o diretório do projeto e o diretório do markdown. O diretório do markdown é a pasta onde o arquivo foi salvo. 
+
+```{r import}
+caminho <- here::here("dados", "pinguins.csv")
+pinguins <- readr::read_csv(caminho)
+
+dplyr::glimpse(pinguins)
+
+```
+
+
+
+### Códigos no meio do texto 
+
+Aqui vou escrever um texto que apresenta um resultado no corpo do texto. 
+
+A base de dados pinguins apresenta dados referente à `r nrow(pinguins)` pinguins, das seguintes espécies: `r knitr::combine_words(unique(pinguins$especie), and = "e")`
+Os dados foram coletados entre os anos `r min(pinguins$ano)`e `r max(pinguins$ano)`. O peso médio dos pinguins amostrados foi de 42 kg. 
+Os dados foram obtidos através do pacote Palmer Penguins.
+
+# Inserir figuras no texto com ajustes de página
+
+```{r fig.align='center', fig.cap= "Ilustração dos pinguins", fig.alt= "Rmardown", out.width="50%"  }
+knitr::include_graphics("https://d33wubrfki0l68.cloudfront.net/aee91187a9c6811a802ddc524c3271302893a149/a7003/images/bandthree2.png")
+```
+
+
+# Tabelas
+
+A função kable usa todo o espaco da pagina por padrão. O kabe extra mostra mais opcoes pra fazer tabelas mais
+
+```{r}
+torg <- pinguins |>
+  dplyr::filter(ilha == "Torgersen") |>
+  dplyr::select (comprimento_bico:massa_corporal)
+
+knitr::kable(torg)
+
+
+```
+
+Tabelas com datatable tem opcoes dinamicas.
+
+```{r}
+
+DT::datatable(torg)
+```
+
+```{r}
+reactable::reactable(torg)
+```
+
+
+```{r}
+quantidade_de_especies <- pinguins |> 
+  dplyr::count(especie, sort =TRUE) |> 
+  janitor::adorn_totals()
+
+reactable::reactable(quantidade_de_especies)
+```
+
+## Renomeando titulo de tabelas 
+
+```{r renomeando titulo tabelas}
+quantidade_de_especies |> 
+  dplyr::rename("Espécie"= especie, "Número de Pinguins" = n) |> 
+  knitr::kable()
+  
+```
+
+## Centralizando tabelas 
+```{r tamanho tabelas}
+quantidade_de_especies |> 
+  dplyr::rename("Espécie"= especie, "Número de Pinguins" = n) |> 
+  knitr::kable() |> 
+  kableExtra::kable_styling(full_width = FALSE)
+```
+
+## Gerando arquivo PDF
+
+Para isso basta inserir no cabeçalho (YAML)  o seguinte comando: `knit: pagedown::chrome_print`
+ou pode fazer isso utilizando a função `padedown::chrome_print("caminho/ate/arquivo")`. 
+
+
+## Mudar o tema do HTML
+
+Para mudar o tema incluir: `output: prettydoc::html_pretty:theme: architect` ou `output: prettydoc::html_pretty:theme: architect`
+
+# Parametros
+
+Para inserir parametros, coloca no YAML `params: ano:2002`. 
+Inseri o nome da variável e o parametro(2002), serve como um filtro. Quando precisa gerar
+muitos relatorios iguais, pra anos diferentes por exemplo. 
+E no chunk:
+
+```{r}
+pinguins_filtrado <- pinguins |> 
+  dplyr::filter(ano==params$ano)
+
+dplyr::count(pinguins_filtrado)
+
+knitr::kable(pinguins_filtrado)
+```
+
+
+# Links úteis para relatórios com Rmarkdown
+
+
+[Tabelas - Pacote Kable Extra - deixa as tabelas mais bonitas](https://haozhu233.github.io/kableExtra/awesome_table_in_html.html)
+
+[Cheat sheet do pacote flextable - tabelas para o word](https://ardata-fr.github.io/flextable-book/static/assets/pdf/cheat_sheet_flextable.pdf)
+
+[Livro do pacote flextable - tabelas para o word](https://ardata-fr.github.io/flextable-book/)
+
+[Criando um relatório personalizado no Word através do R Markdown](https://blog.curso-r.com/posts/2021-12-23-word-rmarkdown/)
+
+[	Dicas para relatórios: gráficos, tabelas, e dicas gerais](https://beatrizmilz.com/blog/2020-12-03-dicas-serie/03-relatorio/)
+
+[	Capítulo de livro sobre Relatórios com parâmetros](https://bookdown.org/yihui/rmarkdown/parameterized-reports.html)
+
+
+
